@@ -1,0 +1,72 @@
+use axios to submit details of new user(other participant in the video chat)
+
+const onSubmit = async(event) => {
+  event.preventDefault();
+  
+  const result = await axios({
+    method: 'POST',
+    url: 'https://straw-quoll-8562.twil.io/create-token',
+    withCredentials: true,
+    data: {
+      identity: 'name of other user'
+    }
+  });
+
+  const jwt = result.data;
+}
+
+
+name of other user and room number in state
+token saved in state and picked in video component
+
+
+create video
+import TwilioVideo from twilio-video
+
+mounted: {
+  TwilioVideo
+  .connect(token, {video: true, audio: true, name: 'test'})
+  .then(room => {
+
+    //attach local video
+    TwilioVideo.createLocalVideoTrack().then(track => {
+      this.$ref.localVideoRef.current.appendChild(track.attach());
+      // this.$ref.remoteVideoRef.current.appendChild(track.attach())
+    });
+    console.log('successfully joined room'); 
+    console.log(room);
+
+
+    //helper function to attach all video tracks of participants
+    const addParticipant = participant => {
+      participant.tracks.forEach(publication => {
+        if(publication.isSubscribe) {
+          const track = publication.track;
+
+          remoteVideoRef.current.appendChild(track.attach());
+          console.log('attached to remote video');
+        }
+      })
+
+      participant.on('trackSubscribed', track => {
+        console.log('track subscribed');
+        remoteVideoRef.current.appendChild(track.attach())
+      })
+    }
+
+    
+
+    room.participants.forEach(addParticipant);
+    room.on('participantConnected', addParticipant);
+  })
+}
+
+
+// add controls, watch for when video disconnects and reconnects
+
+
+<div>
+  <div id="localmedia" ref="localVideoRef"></div>
+  <div id="remotemedia" ref="remoteVideoRef"></div>
+
+</div>
