@@ -1,10 +1,10 @@
 <template>
-  <div id="app">
+  <main id="app">
     <!-- <LoginForm v-if="tokenSent === true ? hideForm : !hideForm" /> -->
     <LoginForm v-if="hideForm" />
     <Video />
     <!-- <Video v-if="tokenSent === true ? !hideForm : hideForm" /> -->
-  </div>
+  </main>
 </template>
 
 <script>

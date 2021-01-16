@@ -8,8 +8,25 @@ body,
   padding: 0;
 }
 
+button {
+  cursor: pointer;
+  outline: none;
+}
+
 .flex {
   display: flex;
+}
+
+.flex-col {
+  flex-direction: column;
+}
+
+.flex-row {
+  flex-direction: row;
+}
+
+.flex-auto {
+  flex: auto;
 }
 
 .flex-v-center {
@@ -18,6 +35,14 @@ body,
 
 .flex-h-center {
   justify-content: center;
+}
+
+.flex-h-around {
+  justify-content: space-around;
+}
+
+.flex-h-bet {
+  justify-content: space-between;
 }
 
 .full-screen-height {
@@ -30,4 +55,12 @@ body,
 
 .full-width {
   width: 100%;
+}
+
+.no-border {
+  border: none;
+}
+
+.bg-transparent {
+  background: transparent;
 }

@@ -1,102 +1,60 @@
 <template>
-  <div>
-    <div ref="localVideoRef"></div>
-    <div ref="remoteVideoRef"></div>
+  <div class="video">
+    <div class="flex flex-col full-screen-height video__container">
+      <div
+        v-for="item in video_list"
+        :key="item.id"
+        :id="item.idName"
+        :ref="item.ref"
+        class="video__body full-width"
+      >
+        <img :src="require(`@/assets/${item.img}`)" alt="" />
+      </div>
+    </div>
+    <OptionButtons />
+    <!-- <div id="localVideo" ref="localVideoRef" class="video-container"></div>
+    <div id="remoteVideo" ref="remoteVideoRef" class="video-container"></div> -->
   </div>
 </template>
 <script>
-import { connect, createLocalVideoTrack } from "twilio-video";
-import { mapState } from "vuex";
+import OptionButtons from "./OptionButtons";
+
 export default {
-  computed: {
-    ...mapState(["token"]),
+  components: {
+    OptionButtons,
   },
-  mounted() {
-    connect(this.token, {
-      audio: true,
-      video: true,
-      name: "test",
-      logLevel: "debug",
-    })
-      .then((room) => {
-        console.log(room);
-        this.attachLocalVideo(this.$refs.localVideoRef);
-        room.participants.forEach((participant) => {
-          participant.tracks.forEach((publication) => {
-            // check if participant accepted video and audio access
-            if (publication.track) {
-              const track = publication.track;
-
-              this.$refs.remoteVideoRef.appendChild(track.attach());
-              console.log("attached to remote video");
-            }
-          });
-
-          participant.on("trackSubscribed", (track) => {
-            console.log("track subscribed", {
-              remote: this.$refs,
-            });
-            this.$refs.remoteVideoRef.appendChild(track.attach());
-          });
-        });
-        room.on("participantConnected", (participant) => {
-          console.log(`A remote Participant connected: ${participant}`);
-          participant.tracks.forEach((publication) => {
-            // check if participant accepted video and audio access
-            if (publication.isSubscribed) {
-              const track = publication.track;
-
-              this.$refs.remoteVideoRef.appendChild(track.attach());
-              console.log("attached to remote video");
-            }
-          });
-
-          participant.on("trackSubscribed", (track) => {
-            console.log("track subscribed", {
-              remote: this.$refs.remoteVideoRef,
-            });
-            this.$refs.remoteVideoRef.appendChild(track.attach());
-          });
-        });
-      })
-      .catch((error) => {
-        // setLogLevel(.debug);
-        console.log({ connectionError: error });
-      });
-  },
-  methods: {
-    attachLocalVideo: (localVid) => {
-      createLocalVideoTrack()
-        .then((track) => {
-          console.log({
-            local: localVid,
-            track,
-          });
-          localVid.appendChild(track.attach());
-        })
-        .catch((error) => console.log({ localVideoError: error }));
-    },
-    // addParticipant: (participant) => {
-    //   console.log(`A remote Participant connected: ${participant}`);
-    //   // display a remote participant video
-    //   participant.tracks.forEach((publication) => {
-    //     // check if participant accepted video and audio access
-    //     if (publication.isSubscribed) {
-    //       const track = publication.track;
-
-    //       this.$refs.remoteVideoRef.appendChild(track.attach());
-    //       console.log("attached to remote video");
-    //     }
-    //   });
-
-    //   //append participants video
-    //   participant.on("trackSubscribed", (track) => {
-    //     console.log("track subscribed", {
-    //       remote: this.$refs,
-    //     });
-    //     // this.$refs.remoteVideoRef.appendChild(track.attach());
-    //   });
-    // },
+  data() {
+    return {
+      video_list: [
+        {
+          id: 1,
+          ref: "remoteVideoRef",
+          idName: "remoteVideo",
+          img: "images/image1.jpg",
+        },
+        {
+          id: 2,
+          ref: "localVideoRef",
+          idName: "localVideo",
+          img: "images/image2.jpg",
+        },
+      ],
+    };
   },
 };
 </script>
+<style scoped>
+.video {
+  position: relative;
+}
+
+.video__body {
+  border: 1px solid;
+  background: yellow;
+}
+
+.video__body > img {
+  width: 100%;
+  height: auto;
+}
+</style>
