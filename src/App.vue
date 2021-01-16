@@ -1,7 +1,9 @@
 <template>
   <div id="app">
-    <LoginForm v-if="tokenSent === true ? hideForm : !hideForm" />
-    <Video v-if="tokenSent === true ? !hideForm : hideForm" />
+    <!-- <LoginForm v-if="tokenSent === true ? hideForm : !hideForm" /> -->
+    <LoginForm v-if="hideForm" />
+    <Video />
+    <!-- <Video v-if="tokenSent === true ? !hideForm : hideForm" /> -->
   </div>
 </template>
 
