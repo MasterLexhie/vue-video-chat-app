@@ -1,0 +1,33 @@
+* {
+  box-sizing: border-box;
+}
+
+body,
+* {
+  margin: 0;
+  padding: 0;
+}
+
+.flex {
+  display: flex;
+}
+
+.flex-v-center {
+  align-items: center;
+}
+
+.flex-h-center {
+  justify-content: center;
+}
+
+.full-screen-height {
+  height: 100vh;
+}
+
+.full-height {
+  height: 100%;
+}
+
+.full-width {
+  width: 100%;
+}

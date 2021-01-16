@@ -1,0 +1,102 @@
+<template>
+  <div>
+    <div ref="localVideoRef"></div>
+    <div ref="remoteVideoRef"></div>
+  </div>
+</template>
+<script>
+import { connect, createLocalVideoTrack } from "twilio-video";
+import { mapState } from "vuex";
+export default {
+  computed: {
+    ...mapState(["token"]),
+  },
+  mounted() {
+    connect(this.token, {
+      audio: true,
+      video: true,
+      name: "test",
+      logLevel: "debug",
+    })
+      .then((room) => {
+        console.log(room);
+        this.attachLocalVideo(this.$refs.localVideoRef);
+        room.participants.forEach((participant) => {
+          participant.tracks.forEach((publication) => {
+            // check if participant accepted video and audio access
+            if (publication.track) {
+              const track = publication.track;
+
+              this.$refs.remoteVideoRef.appendChild(track.attach());
+              console.log("attached to remote video");
+            }
+          });
+
+          participant.on("trackSubscribed", (track) => {
+            console.log("track subscribed", {
+              remote: this.$refs,
+            });
+            this.$refs.remoteVideoRef.appendChild(track.attach());
+          });
+        });
+        room.on("participantConnected", (participant) => {
+          console.log(`A remote Participant connected: ${participant}`);
+          participant.tracks.forEach((publication) => {
+            // check if participant accepted video and audio access
+            if (publication.isSubscribed) {
+              const track = publication.track;
+
+              this.$refs.remoteVideoRef.appendChild(track.attach());
+              console.log("attached to remote video");
+            }
+          });
+
+          participant.on("trackSubscribed", (track) => {
+            console.log("track subscribed", {
+              remote: this.$refs.remoteVideoRef,
+            });
+            this.$refs.remoteVideoRef.appendChild(track.attach());
+          });
+        });
+      })
+      .catch((error) => {
+        // setLogLevel(.debug);
+        console.log({ connectionError: error });
+      });
+  },
+  methods: {
+    attachLocalVideo: (localVid) => {
+      createLocalVideoTrack()
+        .then((track) => {
+          console.log({
+            local: localVid,
+            track,
+          });
+          localVid.appendChild(track.attach());
+        })
+        .catch((error) => console.log({ localVideoError: error }));
+    },
+    // addParticipant: (participant) => {
+    //   console.log(`A remote Participant connected: ${participant}`);
+    //   // display a remote participant video
+    //   participant.tracks.forEach((publication) => {
+    //     // check if participant accepted video and audio access
+    //     if (publication.isSubscribed) {
+    //       const track = publication.track;
+
+    //       this.$refs.remoteVideoRef.appendChild(track.attach());
+    //       console.log("attached to remote video");
+    //     }
+    //   });
+
+    //   //append participants video
+    //   participant.on("trackSubscribed", (track) => {
+    //     console.log("track subscribed", {
+    //       remote: this.$refs,
+    //     });
+    //     // this.$refs.remoteVideoRef.appendChild(track.attach());
+    //   });
+    // },
+  },
+};
+</script>

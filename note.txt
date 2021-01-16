@@ -23,6 +23,17 @@ token saved in state and picked in video component
 create video
 import TwilioVideo from twilio-video
 
+// helper function that connects the video
+
+connectVideo = (nameOfRoom) => {
+  connect(token, { video: true, audio: true, name: nameOfRoom })
+  .then(room => {
+    
+  })
+}
+
+
+
 mounted: {
   TwilioVideo
   .connect(token, {video: true, audio: true, name: 'test'})

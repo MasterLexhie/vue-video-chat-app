@@ -1,28 +1,32 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png" width="25%">
-    <HelloWorld msg="Hello Vue in CodeSandbox!"/>
+    <LoginForm v-if="tokenSent === true ? hideForm : !hideForm" />
+    <Video v-if="tokenSent === true ? !hideForm : hideForm" />
   </div>
 </template>
 
 <script>
-import HelloWorld from "./components/HelloWorld";
+import { mapState } from "vuex";
+import LoginForm from "./components/LoginForm";
+import Video from "./components/Video";
 
 export default {
   name: "App",
   components: {
-    HelloWorld
-  }
+    LoginForm,
+    Video,
+  },
+  data() {
+    return {
+      hideForm: false,
+    };
+  },
+  computed: {
+    ...mapState(["tokenSent"]),
+  },
+  methods: {},
 };
 </script>
 
 <style>
-#app {
-  font-family: "Avenir", Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
-}
 </style>
