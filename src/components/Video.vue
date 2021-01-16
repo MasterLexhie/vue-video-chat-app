@@ -49,12 +49,12 @@ export default {
 }
 
 .video__body {
-  border: 1px solid;
-  background: yellow;
+  height: 50%;
 }
 
 .video__body > img {
   width: 100%;
-  height: auto;
+  height: 100%;
+  object-fit: cover;
 }
 </style>
