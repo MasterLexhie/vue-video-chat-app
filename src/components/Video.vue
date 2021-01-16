@@ -1,5 +1,13 @@
 <template>
   <div class="video">
+    <div class="users full-width flex flex-h-bet flex-v-center">
+      <button class="add-icon no-border bg-transparent">+</button>
+      <div class="user-box flex">
+        <p class="flex-auto">{{ `User (2)` }}</p>
+        <img :src="require('@/assets/images/icons/person.svg')" alt />
+      </div>
+    </div>
+
     <div class="flex flex-col full-screen-height video__container">
       <div
         v-for="item in video_list"
@@ -56,5 +64,36 @@ export default {
   width: 100%;
   height: 100%;
   object-fit: cover;
+}
+
+.users {
+  position: absolute;
+  padding: 10px 1em;
+}
+
+.add-icon {
+  font-size: 30px;
+  color: #fff;
+  font-weight: bold;
+  background: transparent;
+  border: none;
+}
+
+.user-box {
+  background: #fff;
+  border-radius: 10px;
+  display: inline-block;
+}
+
+.user-box > p {
+  font-weight: bold;
+  color: #999;
+  padding: 5px 20px;
+  font-size: 14px;
+}
+
+.user-box > img {
+  width: 12px;
+  height: auto;
 }
 </style>
