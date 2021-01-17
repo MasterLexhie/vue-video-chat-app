@@ -184,6 +184,10 @@ export default {
   position: relative;
 }
 
+.video__container {
+  background: #222;
+}
+
 .video__body {
   height: 100vh;
 }
