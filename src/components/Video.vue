@@ -4,10 +4,7 @@
     <div v-else>
       <div class="video">
         <div class="users full-width flex flex-h-bet flex-v-center">
-          <div class="user-box flex">
-            <p>{{ `User (${numberOfUser})` }}</p>
-            <img :src="require('@/assets/images/icons/person.svg')" alt />
-          </div>
+          <p v-if="hide">{{ `${remoteUser} has joined the room` }}</p>
         </div>
 
         <div class="flex flex-col full-screen-height video__container">
@@ -34,27 +31,16 @@ export default {
   },
   data() {
     return {
-      isHalf: false,
+      hide: false,
       support: false,
-      numberOfUser: 0,
+      remoteUser: ''
     };
   },
   computed: {
     ...mapState(["token", "room"]),
   },
   watch: {
-    async numberOfUser(value) {
-      const tracks = await createLocalTracks();
-
-      const room = await connect(this.token, {
-        name: this.room,
-        tracks,
-      });
-
-      room.participants.forEach((participant) => {
-        return (value = participant.length);
-      });
-    },
+    
   },
   mounted() {
     this.startVideoChat();
@@ -204,22 +190,21 @@ export default {
           .catch((error) => console.log({ localVideoError: error.message }));
         room.participants.forEach(this.participantConnected);
         room.on("participantConnected", this.participantConnected);
-        room.on("participantDisconnected", this.participantDisconnected);
 
-        // room.participants.forEach(participant => {
-        //   participant.tracks.forEach(publication => {
-        //     if (publication.isSubscribed) {
-        //       handleTrackEnabled(publication.track);
-        //     }
-        //     publication.on('subscribed', handleTrackEnabled);
-        //   });
-        // });
+        room.on("participantDisconnected", this.participantDisconnected);
 
         // window.addEventListener("beforeunload", this.tidyUp(room));
         // window.addEventListener("pagehide", this.tidyUp(room));
       });
     },
     participantConnected(participant) {
+      this.remoteUser = participant.identity;
+      this.hide = true;
+
+      setTimeout(() => {
+        this.hide = false;
+      }, 10);
+
       participant.tracks.forEach((trackPublication) => {
         this.trackPublished(trackPublication, participant);
       });
