@@ -78,10 +78,9 @@ export default {
 </script>
 <style scoped>
 .logo {
-  width: 150px;
-  height: 130px;
-  object-fit: contain;
-  border: 1px solid;
+  width: 100%;
+  height: auto;
+  display: inline-block;
   margin: 0 auto 2rem;
 }
 
