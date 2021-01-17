@@ -166,11 +166,12 @@ export default {
   methods: {
     startVideoChat() {
       connect(this.token, {
-        rooom: this.room,
+        room: this.room,
         video: true,
         audio: false,
+        logLevel: "debug",
       }).then((room) => {
-          createLocalVideoTrack()
+        createLocalVideoTrack()
           .then((track) => {
             this.$refs.localVideoRef.appendChild(track.attach());
           })
