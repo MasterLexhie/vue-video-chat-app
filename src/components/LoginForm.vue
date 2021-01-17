@@ -85,7 +85,7 @@ export default {
 }
 
 .form-container {
-  /* height: 100vh; */
+  height: 100%;
   display: flex;
   background: #f3f3f3;
   justify-content: center;
@@ -96,6 +96,7 @@ export default {
   padding: 3rem 2rem;
   max-width: 400px;
   width: 100%;
+  margin: auto;
   background: #fff;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   backdrop-filter: blur(2.5px);

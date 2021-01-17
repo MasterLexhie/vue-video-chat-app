@@ -1,5 +1,5 @@
 <template>
-  <main id="app">
+  <main id="app" class="full-screen-height">
     <LoginForm v-if="tokenSent === true ? hideForm : !hideForm" />
     <Video v-if="tokenSent === true ? !hideForm : hideForm" />
   </main>
