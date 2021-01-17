@@ -13,7 +13,7 @@
       <div class="flex flex-col full-screen-height video__container">
         <div ref="videoRef" class="video__body full-width"></div>
       </div>
-      <OptionButtons @disconnect.prevent="disconnectVideo()" />
+      <OptionButtons @disconnect-video="leaveRoom()" />
     </div>
   </div>
 </template>
@@ -225,7 +225,7 @@ export default {
       participant.removeAllListeners();
       this.$ref.videoRef.remove();
     },
-    async disconnectVideo() {
+    async leaveRoom() {
       const tracks = await createLocalTracks();
 
       const room = await connect(this.token, {

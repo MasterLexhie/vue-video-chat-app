@@ -23,7 +23,7 @@
       </defs>
       </svg>
     </button>
-    <button @click="disconnect" class="flex flex-h-center flex-v-center no-border bg-transparent">
+    <button @click="disconnect()" class="flex flex-h-center flex-v-center no-border bg-transparent">
       <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#filter0_d)">
       <rect x="4.00002" y="2" width="48" height="48" rx="16" fill="#F74D31"/>
@@ -71,7 +71,7 @@
 export default {
   methods: {
     disconnect() {
-      this.$emit('disconnect')
+      this.$emit('disconnect-video')
     }
   }
 }
