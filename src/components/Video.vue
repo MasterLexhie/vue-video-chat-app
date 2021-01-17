@@ -187,7 +187,7 @@ export default {
       });
       participant.on("trackPublished", this.trackPublished);
     },
-    trackPublished(trackPublication, participant) {
+    trackPublished(trackPublication) {
       const remoteParticipant = this.$refs.remoteVideoRef;
 
       const trackSubscribed = (track) => {
