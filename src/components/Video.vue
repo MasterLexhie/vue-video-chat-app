@@ -196,15 +196,15 @@ export default {
 }
 
 .video__body {
-  height: 50%;
+  height: 100vh;
 }
 
-.video__body > video {
+/* .video__body > video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   transform: scale(-1, 1);
-}
+} */
 
 .users {
   position: absolute;
