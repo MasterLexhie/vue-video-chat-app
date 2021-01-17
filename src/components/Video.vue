@@ -21,7 +21,7 @@
 </template>
 <script>
 import OptionButtons from "./OptionButtons";
-import { connect /* createLocalVideoTrack */ } from "twilio-video";
+import { connect, createLocalVideoTrack } from "twilio-video";
 import { mapState } from "vuex";
 
 export default {
@@ -170,7 +170,12 @@ export default {
         video: true,
         audio: false,
       }).then((room) => {
-        this.participantConnected(room.localParticipant);
+          createLocalVideoTrack()
+          .then((track) => {
+            this.$refs.localVideoRef.appendChild(track.attach());
+          })
+          .catch((error) => console.log({ localVideoError: error.message }));
+        // this.participantConnected(room.localParticipant);
         room.participants.forEach(this.participantConnected);
         room.on("participantConnected", this.participantConnected);
         // room.on('participantDisconnected', this.participantDisconnected);
@@ -180,8 +185,6 @@ export default {
       });
     },
     participantConnected(participant) {
-      // const remoteParticipant = this.$refs.remoteVideoRef;
-
       participant.tracks.forEach((trackPublication) => {
         this.trackPublished(trackPublication, participant);
       });
