@@ -1,6 +1,6 @@
 <template>
   <div class="flex flex-h-around full-width btn-container">
-    <button class="flex flex-h-center flex-v-center no-border bg-transparent">
+    <!-- <button class="flex flex-h-center flex-v-center no-border bg-transparent">
       <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#filter0_d)">
       <rect x="3.99998" y="2" width="48" height="48" rx="16" fill="#999999"/>
@@ -22,7 +22,7 @@
       </filter>
       </defs>
       </svg>
-    </button>
+    </button> -->
     <button @click="disconnect()" class="flex flex-h-center flex-v-center no-border bg-transparent">
       <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#filter0_d)">
@@ -43,7 +43,7 @@
       </defs>
       </svg>
     </button>
-    <button class="flex flex-h-center flex-v-center no-border bg-transparent">
+    <!-- <button class="flex flex-h-center flex-v-center no-border bg-transparent">
       <svg width="56" height="56" viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
       <g filter="url(#filter0_d)">
       <rect x="4" y="50" width="48" height="48" rx="16" transform="rotate(-90 4 50)" fill="white"/>
@@ -64,7 +64,7 @@
       </filter>
       </defs>
       </svg>
-    </button>
+    </button> -->
   </div>
 </template>
 <script>

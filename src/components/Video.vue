@@ -1,19 +1,21 @@
 <template>
   <div class="videoComponent">
     <h1 v-if="support">This browser is not supported by VueChat</h1>
-    <div v-else class="video">
-      <div class="users full-width flex flex-h-bet flex-v-center">
-        <button class="add-icon no-border bg-transparent">+</button>
-        <div class="user-box flex">
-          <p>{{ `User (2)` }}</p>
-          <img :src="require('@/assets/images/icons/person.svg')" alt />
+    <div v-else>
+      <div class="video">
+        <div class="users full-width flex flex-h-bet flex-v-center">
+          <button class="add-icon no-border bg-transparent">+</button>
+          <div class="user-box flex">
+            <p>{{ `User (2)` }}</p>
+            <img :src="require('@/assets/images/icons/person.svg')" alt />
+          </div>
         </div>
-      </div>
 
-      <div class="flex flex-col full-screen-height video__container">
-        <div ref="videoRef" class="video__body full-width"></div>
+        <div class="flex flex-col full-screen-height video__container">
+          <div ref="videoRef" class="video__body full-width"></div>
+        </div>
+        <OptionButtons @disconnect-video="leaveRoom()" />
       </div>
-      <OptionButtons @disconnect-video="leaveRoom()" />
     </div>
   </div>
 </template>
@@ -25,7 +27,7 @@ import {
   createLocalVideoTrack,
   createLocalTracks,
 } from "twilio-video";
-import { mapState } from "vuex";
+import { mapState, mapMutations } from "vuex";
 
 export default {
   components: {
@@ -168,6 +170,7 @@ export default {
   //     });
   // },
   methods: {
+    ...mapMutations(["setToken", "setSentToken"]),
     disconnect() {},
     startVideoChat() {
       if (!isSupported) {
@@ -237,6 +240,7 @@ export default {
         // Detach the local media elements
         room.localParticipant.tracks.forEach((publication) => {
           const attachedElements = publication.track.detach();
+
           attachedElements.forEach((element) => element.remove());
         });
       });
@@ -244,6 +248,8 @@ export default {
       // To disconnect from a Room
       room.disconnect();
       console.log("room disconnected");
+      this.setToken("");
+      this.setSentToken(false);
     },
     // tidyUp(room, event) {
     //   if(event.persisted) {
