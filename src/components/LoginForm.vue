@@ -95,7 +95,8 @@ export default {
 }
 
 .form-container > form {
-  padding: 3rem 2rem;
+  height: 100%;
+  padding: 3rem 2rem 5rem;
   max-width: 400px;
   width: 100%;
   margin: 0 auto;
