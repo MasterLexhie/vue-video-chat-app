@@ -202,6 +202,7 @@ export default {
 .users {
   position: absolute;
   padding: 10px 1em;
+  z-index: 10;
 }
 
 .add-icon {
