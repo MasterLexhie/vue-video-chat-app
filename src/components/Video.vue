@@ -166,7 +166,7 @@ export default {
   methods: {
     startVideoChat() {
       connect(this.token, {
-        room: this.room,
+        name: this.room,
         video: true,
         audio: false,
         logLevel: "debug",
