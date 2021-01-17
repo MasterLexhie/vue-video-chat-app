@@ -48,8 +48,9 @@ export default {
       video: true,
       audio: true,
       name: this.room,
-    }).then(
-      (room) => {
+      logLevel: "debug",
+    })
+      .then((room) => {
         console.log(`Successfully joined a Room: ${room}`);
 
         // create and attach local track to div
@@ -62,6 +63,24 @@ export default {
           })
           .catch((error) => console.log({ localVideoError: error.message }));
 
+        // For RemoteParticipants that are already in the Room
+        room.participants.forEach((participant) => {
+          participant.tracks.forEach((publication) => {
+            if (publication.track) {
+              const track = publication.track;
+              this.$refs.remoteVideoRef.appendChild(track.attach());
+              console.log("attached to remote video");
+            }
+          });
+
+          participant.on("trackSubscribed", (track) => {
+            console.log("track subscribed", {
+              remote: this.$refs.remoteVideoRef,
+            });
+            this.$refs.remoteVideoRef.appendChild(track.attach());
+          });
+        });
+
         room.on("participantConnected", (participant) => {
           console.log(
             `A remote Participant connected: ${participant.identity}`
@@ -73,27 +92,17 @@ export default {
             if (publication.isSubscribed) {
               const track = publication.track;
               this.$refs.remoteVideoRef.appendChild(track.attach());
+              console.log("attached to remote video");
             }
           });
 
           participant.on("trackSubscribed", (track) => {
+            console.log("track subscribed", {
+              remote: this.$refs.remoteVideoRef,
+            });
             this.$refs.remoteVideoRef.appendChild(track.attach());
           });
         });
-
-        // For RemoteParticipants that are already in the Room
-        room.participants.forEach(participant => {
-          participant.tracks.forEach(publication => {
-            if (publication.track) {
-              const track = publication.track;
-              this.$refs.remoteVideoRef.appendChild(track.attach());
-            }
-          });
-
-          participant.on('trackSubscribed', track => {
-              this.$refs.remoteVideoRef.appendChild(track.attach());
-            });
-          });
 
         // room.on('participantDisconnected', participant => {
         //   console.log(`Participant disconnected: ${participant.identity}`);
@@ -169,11 +178,10 @@ export default {
 
         // // To disconnect from a Room
         // room.disconnect();
-      },
-      (error) => {
-        console.error(`Unable to connect to Room: ${error.message}`);
-      }
-    );
+      })
+      .catch((error) => {
+        console.log({ connectionError: error });
+      });
   },
   methods: {
     // changeVideoControls(videoOne, videoTwo) {
