@@ -9,7 +9,7 @@
     </div>
 
     <div class="flex flex-col full-screen-height video__container">
-      <!-- <div ref="remoteVideoRef" class="video__body full-width"></div> -->
+      <div ref="remoteVideoRef" class="video__body full-width"></div>
       <div ref="localVideoRef" class="video__body full-width"></div>
     </div>
     <OptionButtons />
@@ -62,23 +62,26 @@ export default {
           })
           .catch((error) => console.log({ localVideoError: error.message }));
 
-        // room.on('participantConnected', participant => {
-        //   console.log(`A remote Participant connected: ${participant}`);
+        room.on("participantConnected", (participant) => {
+          console.log(
+            `A remote Participant connected: ${participant.identity}`
+          );
 
-        //   // Attach the Participant's Media to a <div> element.
-        //   participant.tracks.forEach(publication => {
-        //     if (publication.isSubscribed) {
-        //       const track = publication.track;
-        //       document.getElementById('remote-media-div').appendChild(track.attach());
-        //     }
-        //   });
+          // Attach the Participant's Media to a <div> element.
+          participant.tracks.forEach((publication) => {
+            // For RemoteParticipants that join the room or that are already in the Room
+            if (publication.isSubscribed || publication.track) {
+              const track = publication.track;
+              this.$refs.remoteVideoRef.appendChild(track.attach());
+            }
+          });
 
-        //   participant.on('trackSubscribed', track => {
-        //     document.getElementById('remote-media-div').appendChild(track.attach());
-        //   });
-        // });
+          participant.on("trackSubscribed", (track) => {
+            this.$refs.remoteVideoRef.appendChild(track.attach());
+          });
+        });
 
-        // // For RemoteParticipants that are already in the Room
+        // For RemoteParticipants that are already in the Room
         // room.participants.forEach(participant => {
         //   participant.tracks.forEach(publication => {
         //     if (publication.track) {
@@ -86,10 +89,10 @@ export default {
         //     }
         //   });
 
-        // participant.on('trackSubscribed', track => {
-        //     document.getElementById('remote-media-div').appendChild(track.attach());
+        //   participant.on('trackSubscribed', track => {
+        //       document.getElementById('remote-media-div').appendChild(track.attach());
+        //     });
         //   });
-        // });
 
         // room.on('participantDisconnected', participant => {
         //   console.log(`Participant disconnected: ${participant.identity}`);
@@ -171,7 +174,11 @@ export default {
       }
     );
   },
-  methods: {},
+  methods: {
+    // changeVideoControls(videoOne, videoTwo) {
+    //   videoOne.
+    // }
+  },
 };
 </script>
 <style scoped>
@@ -183,10 +190,11 @@ export default {
   height: 50%;
 }
 
-.video__body video {
+.video__body > video {
   width: 100%;
   height: 100%;
   object-fit: cover;
+  transform: scale(-1, 1);
 }
 
 .users {
