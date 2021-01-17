@@ -22,7 +22,7 @@
 </template>
 <script>
 import OptionButtons from "./OptionButtons";
-import { connect /* createLocalVideoTrack */ } from "twilio-video";
+import { connect, createLocalVideoTrack } from "twilio-video";
 import { mapState } from "vuex";
 
 export default {
@@ -56,6 +56,18 @@ export default {
     }).then(
       (room) => {
         console.log(`Successfully joined a Room: ${room}`);
+
+        // create and attach local track to div
+        createLocalVideoTrack()
+          .then((track) => {
+            console.log({
+              local: this.$refs.localVideoRef,
+              track,
+            });
+            this.$refs.localVideoRef.appendChild(track.attach());
+          })
+          .catch((error) => console.log({ localVideoError: error.message }));
+
         // room.on('participantConnected', participant => {
         //   console.log(`A remote Participant connected: ${participant}`);
 
