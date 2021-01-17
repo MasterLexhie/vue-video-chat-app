@@ -53,7 +53,7 @@ export default {
     };
   },
   methods: {
-    ...mapMutations(["setToken", "setSentToken"]),
+    ...mapMutations(["setToken", "setSentToken", "setRoom"]),
     async onSubmit(e) {
       this.loader = true;
       e.preventDefault();
@@ -68,10 +68,11 @@ export default {
 
       const jwt = result.data;
       this.setToken(jwt);
+      this.setRoom(this.room);
 
       this.loader = false;
-
       this.setSentToken(true);
+
     },
   },
 };

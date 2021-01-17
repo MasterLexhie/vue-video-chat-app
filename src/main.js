@@ -9,7 +9,7 @@ Vue.config.productionTip = false;
 
 const store = new Vuex.Store({
   state: {
-    room: "Test",
+    room: "",
     token: "",
     tokenSent: false
   },
@@ -19,6 +19,9 @@ const store = new Vuex.Store({
     },
     setSentToken(state, value) {
       return (state.tokenSent = value);
+    },
+    setRoom(state, value) {
+      return (state.room = value);
     }
   }
 });
