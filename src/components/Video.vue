@@ -4,9 +4,8 @@
     <div v-else>
       <div class="video">
         <div class="users full-width flex flex-h-bet flex-v-center">
-          <button class="add-icon no-border bg-transparent">+</button>
           <div class="user-box flex">
-            <p>{{ `User (2)` }}</p>
+            <p>{{ `User (${numberOfUser})` }}</p>
             <img :src="require('@/assets/images/icons/person.svg')" alt />
           </div>
         </div>
@@ -37,10 +36,25 @@ export default {
     return {
       isHalf: false,
       support: false,
+      numberOfUser: 0,
     };
   },
   computed: {
     ...mapState(["token", "room"]),
+  },
+  watch: {
+    async numberOfUser(value) {
+      const tracks = await createLocalTracks();
+
+      const room = await connect(this.token, {
+        name: this.room,
+        tracks,
+      });
+
+      room.participants.forEach((participant) => {
+        return (value = participant.length);
+      });
+    },
   },
   mounted() {
     this.startVideoChat();

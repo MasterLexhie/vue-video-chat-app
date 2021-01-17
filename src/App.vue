@@ -1,7 +1,10 @@
 <template>
   <main id="app">
-    <LoginForm v-if="tokenSent === true ? hideForm : !hideForm" />
-    <Video v-if="tokenSent === true ? !hideForm : hideForm" />
+    <h1 v-if="notMobile">Please switch to a mobile device to access VueChat</h1>
+    <div v-else>
+      <LoginForm v-if="tokenSent === true ? hideForm : !hideForm" />
+      <Video v-if="tokenSent === true ? !hideForm : hideForm" />
+    </div>
   </main>
 </template>
 
@@ -19,12 +22,23 @@ export default {
   data() {
     return {
       hideForm: false,
+      notMobile: false,
     };
   },
   computed: {
     ...mapState(["tokenSent"]),
   },
-  methods: {},
+  mounted() {
+    this.isDeviceMobile();
+  },
+  methods: {
+    isDeviceMobile() {
+      const isMobileDevice = /Mobi/i.test(window.navigator.userAgent);
+      if (!isMobileDevice) {
+        this.notMobile = true;
+      }
+    },
+  },
 };
 </script>
 
