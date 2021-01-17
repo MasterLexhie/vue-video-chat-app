@@ -3,7 +3,7 @@
     <div class="users full-width flex flex-h-bet flex-v-center">
       <button class="add-icon no-border bg-transparent">+</button>
       <div class="user-box flex">
-        <p class="flex-auto">{{ `User (2)` }}</p>
+        <p>{{ `User (2)` }}</p>
         <img :src="require('@/assets/images/icons/person.svg')" alt />
       </div>
     </div>
@@ -82,18 +82,18 @@ export default {
 .user-box {
   background: #fff;
   border-radius: 10px;
-  display: inline-block;
+  padding: 8px 9px;
 }
 
 .user-box > p {
   font-weight: bold;
   color: #999;
-  padding: 5px 20px;
   font-size: 14px;
 }
 
 .user-box > img {
   width: 12px;
   height: auto;
+  margin-left: 10px;
 }
 </style>
