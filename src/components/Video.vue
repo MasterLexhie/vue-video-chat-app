@@ -168,7 +168,7 @@ export default {
       connect(this.token, {
         name: this.room,
         video: true,
-        audio: false,
+        audio: true,
         logLevel: "debug",
       }).then((room) => {
         createLocalVideoTrack()
@@ -176,10 +176,18 @@ export default {
             this.$refs.localVideoRef.appendChild(track.attach());
           })
           .catch((error) => console.log({ localVideoError: error.message }));
-        // this.participantConnected(room.localParticipant);
         room.participants.forEach(this.participantConnected);
         room.on("participantConnected", this.participantConnected);
-        // room.on('participantDisconnected', this.participantDisconnected);
+        room.on('participantDisconnected', this.participantDisconnected);
+
+        // room.participants.forEach(participant => {
+        //   participant.tracks.forEach(publication => {
+        //     if (publication.isSubscribed) {
+        //       handleTrackEnabled(publication.track);
+        //     }
+        //     publication.on('subscribed', handleTrackEnabled);
+        //   });
+        // });
 
         // window.addEventListener("beforeunload", this.tidyUp(room));
         // window.addEventListener("pagehide", this.tidyUp(room));
@@ -204,6 +212,19 @@ export default {
 
       trackPublication.on("subscribed", trackSubscribed);
     },
+    participantDisconnected(participant) {
+      participant.removeAllListeners();
+      this.$ref.localVideoRef.remove();
+    },
+    // tidyUp(room, event) {
+    //   if(event.persisted) {
+    //     return;
+    //   }
+    //   if(room) {
+    //     room.disconnect();
+    //     room = null;
+    //   }
+    // }
   },
 };
 </script>
@@ -217,15 +238,8 @@ export default {
 }
 
 .video__body {
-  height: 100vh;
+  height: 50%;
 }
-
-/* .video__body > video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  transform: scale(-1, 1);
-} */
 
 .users {
   position: absolute;
