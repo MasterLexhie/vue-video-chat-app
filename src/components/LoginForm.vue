@@ -85,10 +85,12 @@ export default {
 }
 
 .form-container {
-  display: flex;
   background: #f3f3f3;
-  justify-content: center;
   padding: 3rem 2rem;
+  overflow: auto;
+  position: fixed;
+  width: 100%;
+
 }
 
 .form-container > form {
