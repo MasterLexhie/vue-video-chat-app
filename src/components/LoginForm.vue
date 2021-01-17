@@ -85,7 +85,7 @@ export default {
 }
 
 .form-container {
-  height: 100vh;
+  /* height: 100vh; */
   display: flex;
   background: #f3f3f3;
   justify-content: center;
