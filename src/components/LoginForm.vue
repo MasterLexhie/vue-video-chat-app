@@ -96,7 +96,7 @@ export default {
   padding: 3rem 2rem;
   max-width: 400px;
   width: 100%;
-  margin: auto;
+  margin: 0 auto;
   background: #fff;
   box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
   backdrop-filter: blur(2.5px);
