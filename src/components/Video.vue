@@ -10,7 +10,11 @@
 
     <div class="flex flex-col full-screen-height video__container">
       <div ref="remoteVideoRef" class="video__body full-width"></div>
-      <div ref="localVideoRef" class="video__body full-width"></div>
+      <div 
+        ref="localVideoRef" 
+        :class="{ isHalf: halfHeight }"
+        class="video__body full-width"
+      ></div>
     </div>
     <OptionButtons />
   </div>
@@ -24,22 +28,11 @@ export default {
   components: {
     OptionButtons,
   },
-  // data() {
-  //   return {
-  //     video_list: [
-  //       {
-  //         id: 1,
-  //         ref: "remoteVideoRef",
-  //         idName: "remoteVideo",
-  //       },
-  //       {
-  //         id: 2,
-  //         ref: "localVideoRef",
-  //         idName: "localVideo",
-  //       },
-  //     ],
-  //   };
-  // },
+  data() {
+    return {
+      isHalf: false
+    };
+  },
   computed: {
     ...mapState(["token", "room"]),
   },
@@ -51,14 +44,9 @@ export default {
       // logLevel: "debug",
     })
       .then((room) => {
-        console.log(`Successfully joined a Room: ${room}`);
-
         // create and attach local track to div
         createLocalVideoTrack()
           .then((track) => {
-            console.log({
-              local: this.$refs.localVideoRef,
-            });
             this.$refs.localVideoRef.appendChild(track.attach());
           })
           .catch((error) => console.log({ localVideoError: error.message }));
@@ -70,6 +58,7 @@ export default {
         //       const track = publication.track;
         //       this.$refs.remoteVideoRef.appendChild(track.attach());
         //       console.log("attached to remote video");
+                // this.isHalf = true;
         //     }
         //   });
 
@@ -78,31 +67,36 @@ export default {
         //       remote: this.$refs.remoteVideoRef,
         //     });
         //     this.$refs.remoteVideoRef.appendChild(track.attach());
+              // this.isHalf = true;
         //   });
         // });
 
-        // room.once("participantConnected", (participant) => {
-        //   console.log(
-        //     `A remote Participant connected: ${participant.identity}`
-        //   );
+        room.once("participantConnected", (participant) => {
+          console.log(
+            `A remote Participant connected: ${participant.identity}`, {
+              participant
+            }
+          );
 
-        //   // Attach the Participant's Media to a <div> element.
-        //   participant.tracks.forEach((publication) => {
-        //     // For RemoteParticipants that join the room or that are already in the Room
-        //     if (publication.isSubscribed) {
-        //       const track = publication.track;
-        //       this.$refs.remoteVideoRef.appendChild(track.attach());
-        //       console.log("attached to remote video");
-        //     }
-        //   });
+          // Attach the Participant's Media to a <div> element.
+          participant.tracks.forEach((publication) => {
+            // For RemoteParticipants that join the room or that are already in the Room
+            if (publication.isSubscribed) {
+              const track = publication.track;
+              this.$refs.remoteVideoRef.appendChild(track.attach());
+              console.log("attached to remote video");
+              this.isHalf = true;
+            }
+          });
 
-        //   participant.on("trackSubscribed", (track) => {
-        //     console.log("track subscribed", {
-        //       remote: this.$refs.remoteVideoRef,
-        //     });
-        //     this.$refs.remoteVideoRef.appendChild(track.attach());
-        //   });
-        // });
+          participant.on("trackSubscribed", (track) => {
+            console.log("track subscribed", {
+              remote: this.$refs.remoteVideoRef,
+            });
+            this.$refs.remoteVideoRef.appendChild(track.attach());
+            this.isHalf = true;
+          });
+        });
 
         // room.on('participantDisconnected', participant => {
         //   console.log(`Participant disconnected: ${participant.identity}`);
