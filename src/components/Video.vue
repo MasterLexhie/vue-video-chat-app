@@ -9,13 +9,8 @@
     </div>
 
     <div class="flex flex-col full-screen-height video__container">
-      <div
-        v-for="item in video_list"
-        :key="item.id"
-        :id="item.idName"
-        :ref="item.ref"
-        class="video__body full-width"
-      ></div>
+      <!-- <div ref="remoteVideoRef" class="video__body full-width"></div> -->
+      <div ref="localVideoRef" class="video__body full-width"></div>
     </div>
     <OptionButtons />
   </div>
@@ -29,22 +24,22 @@ export default {
   components: {
     OptionButtons,
   },
-  data() {
-    return {
-      video_list: [
-        {
-          id: 1,
-          ref: "remoteVideoRef",
-          idName: "remoteVideo",
-        },
-        {
-          id: 2,
-          ref: "localVideoRef",
-          idName: "localVideo",
-        },
-      ],
-    };
-  },
+  // data() {
+  //   return {
+  //     video_list: [
+  //       {
+  //         id: 1,
+  //         ref: "remoteVideoRef",
+  //         idName: "remoteVideo",
+  //       },
+  //       {
+  //         id: 2,
+  //         ref: "localVideoRef",
+  //         idName: "localVideo",
+  //       },
+  //     ],
+  //   };
+  // },
   computed: {
     ...mapState(["token", "room"]),
   },
@@ -62,7 +57,6 @@ export default {
           .then((track) => {
             console.log({
               local: this.$refs.localVideoRef,
-              track,
             });
             this.$refs.localVideoRef.appendChild(track.attach());
           })
