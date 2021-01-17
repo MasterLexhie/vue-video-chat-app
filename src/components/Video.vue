@@ -9,12 +9,7 @@
     </div>
 
     <div class="flex flex-col full-screen-height video__container">
-      <div ref="remoteVideoRef" class="video__body full-width"></div>
-      <div
-        ref="localVideoRef"
-        :class="{ isHalf: halfHeight }"
-        class="video__body full-width"
-      ></div>
+      <div ref="videoRef" class="video__body full-width"></div>
     </div>
     <OptionButtons />
   </div>
@@ -173,12 +168,12 @@ export default {
       }).then((room) => {
         createLocalVideoTrack()
           .then((track) => {
-            this.$refs.localVideoRef.appendChild(track.attach());
+            this.$refs.videoRef.appendChild(track.attach());
           })
           .catch((error) => console.log({ localVideoError: error.message }));
         room.participants.forEach(this.participantConnected);
         room.on("participantConnected", this.participantConnected);
-        room.on('participantDisconnected', this.participantDisconnected);
+        // room.on('participantDisconnected', this.participantDisconnected);
 
         // room.participants.forEach(participant => {
         //   participant.tracks.forEach(publication => {
@@ -200,7 +195,7 @@ export default {
       participant.on("trackPublished", this.trackPublished);
     },
     trackPublished(trackPublication) {
-      const remoteParticipant = this.$refs.remoteVideoRef;
+      const remoteParticipant = this.$refs.videoRef;
 
       const trackSubscribed = (track) => {
         remoteParticipant.appendChild(track.attach());
@@ -212,10 +207,10 @@ export default {
 
       trackPublication.on("subscribed", trackSubscribed);
     },
-    participantDisconnected(participant) {
-      participant.removeAllListeners();
-      this.$ref.localVideoRef.remove();
-    },
+    // participantDisconnected(participant) {
+    //   participant.removeAllListeners();
+    //   this.$ref.localVideoRef.remove();
+    // },
     // tidyUp(room, event) {
     //   if(event.persisted) {
     //     return;
@@ -238,6 +233,7 @@ export default {
 }
 
 .video__body {
+  width: 100%;
   height: 50%;
 }
 
