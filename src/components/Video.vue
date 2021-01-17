@@ -51,52 +51,46 @@ export default {
           })
           .catch((error) => console.log({ localVideoError: error.message }));
 
-        // For RemoteParticipants that are already in the Room
-        // room.participants.forEach((participant) => {
-        //   participant.tracks.forEach((publication) => {
-        //     if (publication.track) {
-        //       const track = publication.track;
-        //       this.$refs.remoteVideoRef.appendChild(track.attach());
-        //       console.log("attached to remote video");
-                // this.isHalf = true;
-        //     }
-        //   });
-
-        //   participant.on("trackSubscribed", (track) => {
-        //     console.log("track subscribed", {
-        //       remote: this.$refs.remoteVideoRef,
-        //     });
-        //     this.$refs.remoteVideoRef.appendChild(track.attach());
-              // this.isHalf = true;
-        //   });
-        // });
-
-        room.once("participantConnected", (participant) => {
-          console.log(
-            `A remote Participant connected: ${participant.identity}`, {
-              participant
-            }
-          );
-
-          // Attach the Participant's Media to a <div> element.
-          participant.tracks.forEach((publication) => {
-            // For RemoteParticipants that join the room or that are already in the Room
-            if (publication.isSubscribed) {
-              const track = publication.track;
-              this.$refs.remoteVideoRef.appendChild(track.attach());
-              console.log("attached to remote video");
-              this.isHalf = true;
-            }
-          });
-
-          participant.on("trackSubscribed", (track) => {
-            console.log("track subscribed", {
-              remote: this.$refs.remoteVideoRef,
+          // For RemoteParticipants that are already in the Room
+          room.participants.forEach((participant) => {
+            participant.tracks.forEach((publication) => {
+              if (publication.track) {
+                const track = publication.track;
+                this.$refs.remoteVideoRef.appendChild(track.attach());
+                console.log("attached to remote video");
+                this.isHalf = true;
+              }
             });
-            this.$refs.remoteVideoRef.appendChild(track.attach());
-            this.isHalf = true;
+
+            participant.on("trackSubscribed", (track) => {
+              this.$refs.remoteVideoRef.appendChild(track.attach());
+              this.isHalf = true;
+            });
           });
-        });
+
+          room.once("participantConnected", (participant) => {
+            console.log(
+              `A remote Participant connected: ${participant.identity}`, {
+                participant
+              }
+            );
+
+            // Attach the Participant's Media to a <div> element.
+            participant.tracks.forEach((publication) => {
+              // For RemoteParticipants that join the room or that are already in the Room
+              if (publication.isSubscribed) {
+                const track = publication.track;
+                this.$refs.remoteVideoRef.appendChild(track.attach());
+                console.log("attached to remote video");
+                this.isHalf = true;
+              }
+            });
+
+            participant.on("trackSubscribed", (track) => {
+              this.$refs.remoteVideoRef.appendChild(track.attach());
+              this.isHalf = true;
+            });
+          });
 
         // room.on('participantDisconnected', participant => {
         //   console.log(`Participant disconnected: ${participant.identity}`);
