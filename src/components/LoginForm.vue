@@ -85,7 +85,6 @@ export default {
 }
 
 .form-container {
-  height: 100%;
   display: flex;
   background: #f3f3f3;
   justify-content: center;
