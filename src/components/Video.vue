@@ -70,7 +70,7 @@ export default {
           // Attach the Participant's Media to a <div> element.
           participant.tracks.forEach((publication) => {
             // For RemoteParticipants that join the room or that are already in the Room
-            if (publication.isSubscribed || publication.track) {
+            if (publication.isSubscribed) {
               const track = publication.track;
               this.$refs.remoteVideoRef.appendChild(track.attach());
             }
@@ -82,17 +82,18 @@ export default {
         });
 
         // For RemoteParticipants that are already in the Room
-        // room.participants.forEach(participant => {
-        //   participant.tracks.forEach(publication => {
-        //     if (publication.track) {
-        //       document.getElementById('remote-media-div').appendChild(publication.track.attach());
-        //     }
-        //   });
+        room.participants.forEach(participant => {
+          participant.tracks.forEach(publication => {
+            if (publication.track) {
+              const track = publication.track;
+              this.$refs.remoteVideoRef.appendChild(track.attach());
+            }
+          });
 
-        //   participant.on('trackSubscribed', track => {
-        //       document.getElementById('remote-media-div').appendChild(track.attach());
-        //     });
-        //   });
+          participant.on('trackSubscribed', track => {
+              this.$refs.remoteVideoRef.appendChild(track.attach());
+            });
+          });
 
         // room.on('participantDisconnected', participant => {
         //   console.log(`Participant disconnected: ${participant.identity}`);
