@@ -1,22 +1,30 @@
 <template>
-  <div class="video">
-    <div class="users full-width flex flex-h-bet flex-v-center">
-      <button class="add-icon no-border bg-transparent">+</button>
-      <div class="user-box flex">
-        <p>{{ `User (2)` }}</p>
-        <img :src="require('@/assets/images/icons/person.svg')" alt />
+  <div class="videoComponent">
+    <h1 v-if="support">This browser is not supported by VueChat</h1>
+    <div v-else class="video">
+      <div class="users full-width flex flex-h-bet flex-v-center">
+        <button class="add-icon no-border bg-transparent">+</button>
+        <div class="user-box flex">
+          <p>{{ `User (2)` }}</p>
+          <img :src="require('@/assets/images/icons/person.svg')" alt />
+        </div>
       </div>
-    </div>
 
-    <div class="flex flex-col full-screen-height video__container">
-      <div ref="videoRef" class="video__body full-width"></div>
+      <div class="flex flex-col full-screen-height video__container">
+        <div ref="videoRef" class="video__body full-width"></div>
+      </div>
+      <OptionButtons @disconnect.prevent="disconnectVideo()" />
     </div>
-    <OptionButtons />
   </div>
 </template>
 <script>
 import OptionButtons from "./OptionButtons";
-import { connect, createLocalVideoTrack } from "twilio-video";
+import {
+  isSupported,
+  connect,
+  createLocalVideoTrack,
+  createLocalTracks,
+} from "twilio-video";
 import { mapState } from "vuex";
 
 export default {
@@ -26,6 +34,7 @@ export default {
   data() {
     return {
       isHalf: false,
+      support: false,
     };
   },
   computed: {
@@ -159,7 +168,12 @@ export default {
   //     });
   // },
   methods: {
+    disconnect() {},
     startVideoChat() {
+      if (!isSupported) {
+        return (this.support = true);
+      }
+
       connect(this.token, {
         name: this.room,
         video: true,
@@ -173,7 +187,7 @@ export default {
           .catch((error) => console.log({ localVideoError: error.message }));
         room.participants.forEach(this.participantConnected);
         room.on("participantConnected", this.participantConnected);
-        // room.on('participantDisconnected', this.participantDisconnected);
+        room.on("participantDisconnected", this.participantDisconnected);
 
         // room.participants.forEach(participant => {
         //   participant.tracks.forEach(publication => {
@@ -207,10 +221,21 @@ export default {
 
       trackPublication.on("subscribed", trackSubscribed);
     },
-    // participantDisconnected(participant) {
-    //   participant.removeAllListeners();
-    //   this.$ref.localVideoRef.remove();
-    // },
+    participantDisconnected(participant) {
+      participant.removeAllListeners();
+      this.$ref.videoRef.remove();
+    },
+    async disconnectVideo() {
+      const tracks = await createLocalTracks();
+
+      const room = await connect(this.token, {
+        name: this.room,
+        tracks,
+      });
+
+      room.disconnect();
+      console.log("room disconnected");
+    },
     // tidyUp(room, event) {
     //   if(event.persisted) {
     //     return;
