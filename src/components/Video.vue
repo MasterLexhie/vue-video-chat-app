@@ -128,6 +128,10 @@ export default {
             const attachedElements = publication.track.detach();
             attachedElements.forEach((element) => element.remove());
           });
+
+          const remoteUser = document.getElementById(room.localParticipant.sid);
+          remoteUser.remove();
+
           console.log({
             remoteUser: room.localParticipant,
           });
@@ -215,6 +219,11 @@ export default {
 .video__body {
   width: 100%;
   height: 50%;
+}
+
+.video__ref > div {
+  width: 100%;
+  height: 100%;
 }
 
 .users {
