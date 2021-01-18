@@ -1,102 +1,175 @@
 <template>
-  <div>
-    <div ref="localVideoRef"></div>
-    <div ref="remoteVideoRef"></div>
+  <div class="videoComponent">
+    <h1 v-if="noSupport">
+      This browser is not supported by VueChat. Switch to Chrome, Firefox on
+      Android and Safari on iOS for best experience
+    </h1>
+    <div v-else>
+      <div class="video">
+        <!-- <div class="users full-width flex flex-h-bet flex-v-center">
+          <p v-if="hide">{{ `${remoteUser} has joined the room` }}</p>
+        </div> -->
+        <div class="flex flex-col full-screen-height video__container">
+          <div ref="videoRef" class="video__body full-width"></div>
+        </div>
+        <OptionButtons @disconnect-video="leaveRoom()" />
+      </div>
+    </div>
   </div>
 </template>
 <script>
-import { connect, createLocalVideoTrack } from "twilio-video";
-import { mapState } from "vuex";
+import OptionButtons from "./OptionButtons";
+import { isSupported, connect, createLocalTracks } from "twilio-video";
+import { mapState, mapMutations } from "vuex";
+
 export default {
+  components: {
+    OptionButtons,
+  },
+  data() {
+    return {
+      hide: false,
+      noSupport: false,
+      remoteUser: "",
+      activeRoom: "",
+    };
+  },
   computed: {
-    ...mapState(["token"]),
+    ...mapState(["token", "room"]),
   },
   mounted() {
-    connect(this.token, {
-      audio: true,
-      video: true,
-      name: "test",
-      logLevel: "debug",
-    })
-      .then((room) => {
-        console.log(room);
-        this.attachLocalVideo(this.$refs.localVideoRef);
+    this.startVideoChat();
+  },
+  methods: {
+    ...mapMutations(["setToken", "setSentToken"]),
+    startVideoChat() {
+      if (!isSupported) {
+        return (this.noSupport = true);
+      }
+
+      // connect to Video
+      connect(this.token, {
+        name: this.room,
+        video: true,
+        audio: true,
+      }).then((room) => {
+        const mediaContainer = this.$refs.videoRef;
+        this.activeRoom = room;
+
+        createLocalTracks().then((Tracks) => {
+          Tracks.forEach((track) => {
+            mediaContainer.appendChild(track.attach());
+          });
+        });
+
         room.participants.forEach((participant) => {
+          const div = document.createElement("div");
+          div.id = participant.sid;
+          mediaContainer.appendChild(div);
+
           participant.tracks.forEach((publication) => {
             // check if participant accepted video and audio access
             if (publication.track) {
               const track = publication.track;
-
-              this.$refs.remoteVideoRef.appendChild(track.attach());
-              console.log("attached to remote video");
+              div.appendChild(track.attach());
             }
           });
-
           participant.on("trackSubscribed", (track) => {
-            console.log("track subscribed", {
-              remote: this.$refs,
-            });
-            this.$refs.remoteVideoRef.appendChild(track.attach());
+            div.appendChild(track.attach());
           });
         });
+
         room.on("participantConnected", (participant) => {
-          console.log(`A remote Participant connected: ${participant}`);
+          const div = document.createElement("div");
+          div.id = participant.sid;
+          mediaContainer.appendChild(div);
+
           participant.tracks.forEach((publication) => {
+            const track = publication.track;
+
             // check if participant accepted video and audio access
             if (publication.isSubscribed) {
-              const track = publication.track;
-
-              this.$refs.remoteVideoRef.appendChild(track.attach());
-              console.log("attached to remote video");
+              div.appendChild(track.attach());
             }
           });
-
           participant.on("trackSubscribed", (track) => {
-            console.log("track subscribed", {
-              remote: this.$refs.remoteVideoRef,
-            });
-            this.$refs.remoteVideoRef.appendChild(track.attach());
+            div.appendChild(track.attach());
           });
         });
-      })
-      .catch((error) => {
-        // setLogLevel(.debug);
-        console.log({ connectionError: error });
-      });
-  },
-  methods: {
-    attachLocalVideo: (localVid) => {
-      createLocalVideoTrack()
-        .then((track) => {
-          console.log({
-            local: localVid,
-            track,
+
+        room.on("disconnected", (room) => {
+          // Detach the local media elements
+          room.localParticipant.tracks.forEach((publication) => {
+            publication.track.stop(); // stop all tracks
+            const attachedElements = publication.track.detach();
+            attachedElements.forEach((element) => element.remove());
           });
-          localVid.appendChild(track.attach());
-        })
-        .catch((error) => console.log({ localVideoError: error }));
+
+          this.activeRoom = null;
+        });
+
+        room.on("participantDisconnected", (participant) => {
+          participant.tracks.forEach((publication) => {
+            publication.track.stop(); // stop all tracks
+            const attachedElements = publication.track.detach();
+            attachedElements.forEach((element) => element.remove());
+          });
+          this.activeRoom = null;
+        });
+      });
     },
-    // addParticipant: (participant) => {
-    //   console.log(`A remote Participant connected: ${participant}`);
-    //   // display a remote participant video
-    //   participant.tracks.forEach((publication) => {
-    //     // check if participant accepted video and audio access
-    //     if (publication.isSubscribed) {
-    //       const track = publication.track;
-
-    //       this.$refs.remoteVideoRef.appendChild(track.attach());
-    //       console.log("attached to remote video");
-    //     }
-    //   });
-
-    //   //append participants video
-    //   participant.on("trackSubscribed", (track) => {
-    //     console.log("track subscribed", {
-    //       remote: this.$refs,
-    //     });
-    //     // this.$refs.remoteVideoRef.appendChild(track.attach());
-    //   });
-    // },
+    leaveRoom() {
+      this.activeRoom.disconnect();
+      this.setToken("");
+      this.setSentToken(false);
+      window.location.reload();
+    },
   },
 };
 </script>
+<style scoped>
+.video {
+  position: relative;
+}
+
+.video__container {
+  background: #222;
+}
+
+.video__body {
+  width: 100%;
+  height: 50%;
+}
+
+.users {
+  position: absolute;
+  padding: 10px 1em;
+  z-index: 10;
+}
+
+.add-icon {
+  font-size: 30px;
+  color: #fff;
+  font-weight: bold;
+  background: transparent;
+  border: none;
+}
+
+.user-box {
+  background: #fff;
+  border-radius: 10px;
+  padding: 8px 9px;
+}
+
+.user-box > p {
+  font-weight: bold;
+  color: #999;
+  font-size: 14px;
+}
+
+.user-box > img {
+  width: 12px;
+  height: auto;
+  margin-left: 10px;
+}
+</style>
