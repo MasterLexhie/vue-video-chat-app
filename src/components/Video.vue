@@ -53,42 +53,10 @@ export default {
       }).then((room) => {
         const mediaContainer = this.$refs.videoRef;
 
-        // helperFunction:  attach tracks to media container
-        const attachTrack = (track) => {
-          mediaContainer.appendChild(track.attach());
-        };
-
         this.getLocalTrack(mediaContainer);
 
-        // Tracks that the Participant has already published and will eventually be published
-        room.on("participantConnected", (participant) => {
-          console.log(`Participant "${participant.identity}" connected`);
-
-          participant.tracks.forEach((publication) => {
-            if (publication.isSubscribed) {
-              const track = publication.track;
-              mediaContainer.appendChild(track.attach());
-            }
-          });
-
-          participant.on("trackSubscribed", attachTrack);
-        });
-
-        // attach remote tracks for remote participants that are already in the Room
-        room.participants.forEach((participant) => {
-          console.log(`Participant "${participant.identity}" connected`);
-
-          participant.tracks.forEach((publication) => {
-            if (publication.track) {
-              mediaContainer.appendChild(publication.track.attach());
-            }
-          });
-
-          participant.on("trackSubscribed", attachTrack);
-        });
-
-        // room.participants.forEach(this.participantConnected);
-        // room.on("participantConnected", this.participantConnected);
+        room.participants.forEach(this.participantConnected);
+        room.on("participantConnected", this.participantConnected);
         room.on("participantDisconnected", this.participantDisconnected);
       });
     },
@@ -101,32 +69,32 @@ export default {
         })
         .catch((error) => console.log({ localTrackError: error.message }));
     },
-    // participantConnected(participant) {
-    //   this.remoteUser = participant.identity;
-    //   // this.hide = true;
+    participantConnected(participant) {
+      this.remoteUser = participant.identity;
+      // this.hide = true;
 
-    //   setTimeout(() => {
-    //     this.hide = false;
-    //   }, 10);
+      // setTimeout(() => {
+      //   this.hide = false;
+      // }, 10);
 
-    //   participant.tracks.forEach((trackPublication) => {
-    //     this.trackPublished(trackPublication, participant);
-    //   });
-    //   participant.on("trackPublished", this.trackPublished);
-    // },
-    // trackPublished(trackPublication) {
-    //   const remoteParticipant = this.$refs.videoRef;
+      participant.tracks.forEach((trackPublication) => {
+        this.trackPublished(trackPublication, participant);
+      });
+      participant.on("trackPublished", this.trackPublished);
+    },
+    trackPublished(trackPublication) {
+      const remoteParticipant = this.$refs.videoRef;
 
-    //   const trackSubscribed = (track) => {
-    //     remoteParticipant.appendChild(track.attach());
-    //   };
+      const trackSubscribed = (track) => {
+        remoteParticipant.appendChild(track.attach());
+      };
 
-    //   if (trackPublication.track) {
-    //     trackSubscribed(trackPublication.track);
-    //   }
+      if (trackPublication.track) {
+        trackSubscribed(trackPublication.track);
+      }
 
-    //   trackPublication.on("subscribed", trackSubscribed);
-    // },
+      trackPublication.on("subscribed", trackSubscribed);
+    },
     participantDisconnected(participant) {
       participant.removeAllListeners();
       this.$ref.videoRef.remove();
