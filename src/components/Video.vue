@@ -1,11 +1,14 @@
 <template>
   <div class="videoComponent">
-    <h1 v-if="noSupport">This browser is not supported by VueChat</h1>
+    <h1 v-if="noSupport">
+      This browser is not supported by VueChat. 
+      Switch to Chrome, Firefox on Android and Safari on iOS for best experience
+    </h1>
     <div v-else>
       <div class="video">
-        <div class="users full-width flex flex-h-bet flex-v-center">
+        <!-- <div class="users full-width flex flex-h-bet flex-v-center">
           <p v-if="hide">{{ `${remoteUser} has joined the room` }}</p>
-        </div>
+        </div> -->
 
         <div class="flex flex-col full-screen-height video__container">
           <div ref="videoRef" class="video__body full-width"></div>
@@ -29,12 +32,12 @@ export default {
       hide: false,
       noSupport: false,
       remoteUser: "",
+      activeRoom: ''
     };
   },
   computed: {
     ...mapState(["token", "room"]),
   },
-  watch: {},
   mounted() {
     this.startVideoChat();
   },
@@ -45,65 +48,99 @@ export default {
         return (this.noSupport = true);
       }
 
+      // connect to Video
       connect(this.token, {
         name: this.room,
         video: true,
         audio: true,
-        logLevel: "debug",
-      }).then((room) => {
+      }).then(room => {
         const mediaContainer = this.$refs.videoRef;
+        this.activeRoom = room;
 
         this.getLocalTrack(mediaContainer);
 
+        createLocalTracks()
+        .then( (Tracks) => {
+          Tracks.forEach( (track) => {
+            mediaContainer.appendChild(track.attach());
+          });
+        }).catch((error) => console.log({ localTrackError: error.message }));
+
+        const localParticipant = room.localParticipant;
+        console.log(`Connected to the Room as LocalParticipant "${localParticipant.identity}"`);
+
+
         room.participants.forEach((participant) => {
           console.log(`A remote Participant connected: ${participant}`);
+
+          const div = document.createElement('div');
+          div.id = participant.sid;
+          mediaContainer.appendChild(div);
 
           participant.tracks.forEach((publication) => {
             // check if participant accepted video and audio access
             if (publication.track) {
               const track = publication.track;
-              mediaContainer.appendChild(track.attach());
+              div.appendChild(track.attach());
               console.log("attached to remote video");
             }
           });
           participant.on("trackSubscribed", (track) => {
-            mediaContainer.appendChild(track.attach());
+            div.appendChild(track.attach());
           });
         });
 
         room.on("participantConnected", (participant) => {
-          console.log(`A remote Participant connected: ${participant}`);
+          console.log(`A remote Participant connected: ${participant.identity}`);
+          
+          const div = document.createElement('div');
+          div.id = participant.sid;
+          mediaContainer.appendChild(div);
 
           participant.tracks.forEach((publication) => {
+            const track = publication.track;
+
             // check if participant accepted video and audio access
             if (publication.isSubscribed) {
-              const track = publication.track;
-              mediaContainer.appendChild(track.attach());
+              div.appendChild(track.attach());
               console.log("attached to remote video");
             }
           });
           participant.on("trackSubscribed", (track) => {
-            mediaContainer.appendChild(track.attach());
+            div.appendChild(track.attach());
           });
         });
+        
+        console.log({
+          tracks: room.localParticipant.tracks,
+          videoTracks: room.localParticipant.videoTracks,
+          participants: room.localParticipant
+        })
+
+        room.on("disconnected", (room) => {
+        // Detach the local media elements
+          room.localParticipant.tracks.forEach((publication) => {
+            publication.track.stop(); // stop all tracks
+            const attachedElements = publication.track.detach();
+            attachedElements.forEach((element) => element.remove());
+          });
+
+          this.activeRoom = null
+        });
+        // room.on('participantDisconnected', participant => {
+        //   console.log(`Participant disconnected: ${participant.identity}`);
+
+          
+        // });
 
         // room.participants.forEach(this.participantConnected);
         // room.on("participantConnected", this.participantConnected);
         // room.on("participantDisconnected", this.participantDisconnected);
       });
     },
-    getLocalTrack(localParticipant) {
-      createLocalTracks({ logLevel: "debug" })
-        .then((localTracks) => {
-          localTracks.forEach((track) => {
-            console.log({
-              localParticipant,
-              localParticipantID: localParticipant
-            })
-            localParticipant.appendChild(track.attach());
-          });
-        }).catch((error) => console.log({ localTrackError: error.message }));
-    },
+    // getLocalTrack(localParticipant) {
+      
+    // },
     // participantConnected(participant) {
     //   this.remoteUser = participant.identity;
     //   // this.hide = true;
@@ -130,29 +167,29 @@ export default {
 
     //   trackPublication.on("subscribed", trackSubscribed);
     // },
-    participantDisconnected(participant) {
-      participant.removeAllListeners();
-      this.$ref.videoRef.remove();
-    },
-    async leaveRoom() {
-      const tracks = await createLocalTracks({ logLevel: "debug" });
+    // participantDisconnected(participant) {
+    //   participant.removeAllListeners();
+    //   this.$ref.videoRef.remove();
+    // },
+    leaveRoom() {
+      // const tracks = await createLocalTracks({ logLevel: "debug" });
 
-      const room = await connect(this.token, {
-        name: this.room,
-        tracks,
-      });
+      // const room = await connect(this.token, {
+      //   name: this.room,
+      //   tracks,
+      // });
 
-      room.on("disconnected", (room) => {
-        // Detach the local media elements
-        room.localParticipant.tracks.forEach((publication) => {
-          const attachedElements = publication.track.detach();
+      // room.on("disconnected", (room) => {
+      //   // Detach the local media elements
+      //   room.localParticipant.tracks.forEach((publication) => {
+      //     const attachedElements = publication.track.detach();
 
-          attachedElements.forEach((element) => element.remove());
-        });
-      });
+      //     attachedElements.forEach((element) => element.remove());
+      //   });
+      // });
 
       // To disconnect from a Room
-      room.disconnect();
+      this.activeRoom.disconnect();
       console.log("room disconnected");
       // this.setToken("");
       // this.setSentToken(false);
