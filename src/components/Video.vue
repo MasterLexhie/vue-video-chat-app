@@ -20,7 +20,7 @@
 </template>
 <script>
 import OptionButtons from "./OptionButtons";
-import { isSupported, connect } from "twilio-video";
+import { isSupported, connect, createLocalTracks } from "twilio-video";
 import { mapState, mapMutations } from "vuex";
 
 export default {
@@ -49,11 +49,15 @@ export default {
       }
 
       // connect to Video
-      connect(this.token, {
-        name: this.room,
-        video: true,
-        audio: true,
-      }).then((room) => {
+        createLocalTracks({
+          video: true,
+          audio: true,
+        }).then(localTracks => {
+          return connect(this.token, {
+            name: this.room,
+            tracks: localTracks
+          });
+        }).then((room) => {
         const mediaContainer = this.$refs.videoRef;
         this.activeRoom = room;
 
