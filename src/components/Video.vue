@@ -116,14 +116,6 @@ export default {
             attachedElements.forEach((element) => element.remove());
           });
 
-          // const remotedUser = document.getElementById(
-          //   room.localParticipant.sid
-          // );
-
-          // if (remotedUser.parentNode) {
-          //   remotedUser.parentNode.removeChild(remotedUser);
-          // }
-
           this.activeRoom = null;
         });
 
@@ -140,7 +132,18 @@ export default {
     },
     leaveRoom() {
       // To disconnect from a Room
-      this.activeRoom.disconnect();
+      // const remotedUser = document.getElementById(
+      //   this.activeRoom.localParticipant.sid
+      // );
+
+      // if (remotedUser.parentNode) {
+      //   remotedUser.parentNode.removeChild(remotedUser);
+      // }
+      console.log({
+        room: this.activeRoom
+      })
+
+      // this.activeRoom.disconnect();
       // this.setToken("");
       // this.setSentToken(false);
     },
