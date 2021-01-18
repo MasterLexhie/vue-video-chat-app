@@ -123,6 +123,9 @@ export default {
             publication.track.stop(); // stop all tracks
             const attachedElements = publication.track.detach();
             attachedElements.forEach((element) => element.remove());
+            console.log({
+              remoteUser: room.localParticipant,
+            })
           });
 
           this.activeRoom = null
