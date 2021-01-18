@@ -111,10 +111,16 @@ export default {
           // Detach the local media elements
           room.localParticipant.tracks.forEach((publication) => {
             publication.track.stop(); // stop all tracks
-            publication.unpublish();
             const attachedElements = publication.track.detach();
             attachedElements.forEach((element) => element.remove());
           });
+
+          const removedUser = document.getElementById(
+            room.localParticipant.sid
+          );
+          if (removedUser.parentNode) {
+            removedUser.parentNode.removeChild(removedUser);
+          }
 
           this.activeRoom = null;
         });
@@ -122,30 +128,27 @@ export default {
         room.on("participantDisconnected", (participant) => {
           participant.tracks.forEach((publication) => {
             publication.track.stop(); // stop all tracks
-            publication.unpublish();
             const attachedElements = publication.track.detach();
             attachedElements.forEach((element) => element.remove());
           });
+
+          const removedUser = document.getElementById(participant.sid);
+          if (removedUser.parentNode) {
+            removedUser.parentNode.removeChild(removedUser);
+          }
           this.activeRoom = null;
         });
+
+        window.addEventListener("beforeunload", room.disconnect());
+
+        window.addEventListener("pagehide", room.disconnect()); // for iOS
       });
     },
     leaveRoom() {
-      // To disconnect from a Room
-      // const remotedUser = document.getElementById(
-      //   this.activeRoom.localParticipant.sid
-      // );
-
-      // if (remotedUser.parentNode) {
-      //   remotedUser.parentNode.removeChild(remotedUser);
-      // }
-      console.log({
-        room: this.activeRoom
-      })
-
-      // this.activeRoom.disconnect();
-      // this.setToken("");
-      // this.setSentToken(false);
+      this.activeRoom.disconnect();
+      this.setToken("");
+      this.setSentToken(false);
+      window.location.reload();
     },
   },
 };
