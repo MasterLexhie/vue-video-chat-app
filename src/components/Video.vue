@@ -57,7 +57,7 @@ export default {
         const mediaContainer = this.$refs.videoRef;
         this.activeRoom = room;
 
-        this.getLocalTrack(mediaContainer);
+        // this.getLocalTrack(mediaContainer);
 
         createLocalTracks()
         .then( (Tracks) => {
