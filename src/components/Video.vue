@@ -59,16 +59,17 @@ export default {
 
         // this.getLocalTrack(mediaContainer);
 
-        createLocalTracks()
-          .then((Tracks) => {
-            Tracks.forEach((track) => {
-              mediaContainer.appendChild(track.attach());
-            });
-          })
-          .catch((error) => console.log({ localTrackError: error.message }));
+        // createLocalTracks()
+        //   .then((Tracks) => {
+        //     Tracks.forEach((track) => {
+        //       mediaContainer.appendChild(track.attach());
+        //     });
+        //   })
+        //   .catch((error) => console.log({ localTrackError: error.message }));
 
         console.log(
-          `Connected to the Room as LocalParticipant "${room.localParticipant.identity}"`
+          `Connected to the Room as LocalParticipant "${room.localParticipant.identity}"`,
+          { localParticipant: room.localParticipant }
         );
 
         room.participants.forEach((participant) => {
@@ -119,7 +120,6 @@ export default {
           // Detach the local media elements
           room.localParticipant.tracks.forEach((publication) => {
             publication.track.stop(); // stop all tracks
-            publication.unpublish();
             const attachedElements = publication.track.detach();
             attachedElements.forEach((element) => element.remove());
           });
