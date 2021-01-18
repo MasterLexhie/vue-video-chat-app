@@ -132,7 +132,7 @@ export default {
           });
 
           const remoteUser = document.getElementById(room.localParticipant.sid);
-          mediaContainer.remove(remoteUser);
+          mediaContainer.removeChild(remoteUser);
 
           console.log({
             remoteUser: room.localParticipant,
