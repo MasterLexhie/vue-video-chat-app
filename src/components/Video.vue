@@ -49,119 +49,87 @@ export default {
       }
 
       // connect to Video
-      createLocalTracks({
+      connect(this.token, {
+        name: this.room,
         video: true,
         audio: true,
-      })
-        .then((localTracks) => {
-          return connect(this.token, {
-            name: this.room,
-            tracks: localTracks,
-          });
-        })
-        .then((room) => {
-          const mediaContainer = this.$refs.videoRef;
-          this.activeRoom = room;
+      }).then((room) => {
+        const mediaContainer = this.$refs.videoRef;
+        this.activeRoom = room;
 
-          // this.getLocalTrack(mediaContainer);
-
-          // createLocalTracks()
-          //   .then((Tracks) => {
-          //     Tracks.forEach((track) => {
-          //       mediaContainer.appendChild(track.attach());
-          //     });
-          //   })
-          //   .catch((error) => console.log({ localTrackError: error.message }));
-          console.log({ room });
-          console.log(
-            `Connected to the Room as LocalParticipant "${room.localParticipant.identity}"`,
-            { localParticipant: room.localParticipant }
-          );
-
-          room.participants.forEach((participant) => {
-            console.log(`A remote Participant connected: ${participant}`);
-
-            const div = document.createElement("div");
-            div.id = participant.sid;
-            div.classList.add("full-width", "full-height");
-            mediaContainer.appendChild(div);
-
-            participant.tracks.forEach((publication) => {
-              // check if participant accepted video and audio access
-              if (publication.track) {
-                const track = publication.track;
-                div.appendChild(track.attach());
-                console.log("attached to remote video");
-              }
-            });
-            participant.on("trackSubscribed", (track) => {
-              div.appendChild(track.attach());
-            });
-          });
-
-          room.on("participantConnected", (participant) => {
-            console.log(
-              `A remote Participant connected: ${participant.identity}`
-            );
-
-            const div = document.createElement("div");
-            div.id = participant.sid;
-            mediaContainer.appendChild(div);
-
-            participant.tracks.forEach((publication) => {
-              const track = publication.track;
-
-              // check if participant accepted video and audio access
-              if (publication.isSubscribed) {
-                div.appendChild(track.attach());
-                console.log("attached to remote video");
-              }
-            });
-            participant.on("trackSubscribed", (track) => {
-              div.appendChild(track.attach());
-            });
-          });
-
-          room.on("disconnected", (room) => {
-            // Detach the local media elements
-            room.localParticipant.tracks.forEach((publication) => {
-              publication.track.stop(); // stop all tracks
-              const attachedElements = publication.track.detach();
-              attachedElements.forEach((element) => element.remove());
-            });
-
-            // const remotedUser = document.getElementById(
-            //   room.localParticipant.sid
-            // );
-
-            // if (remotedUser.parentNode) {
-            //   remotedUser.parentNode.removeChild(remotedUser);
-            // }
-
-            // this.activeRoom = null;
+        createLocalTracks().then((Tracks) => {
+          Tracks.forEach((track) => {
+            mediaContainer.appendChild(track.attach());
           });
         });
+
+        room.participants.forEach((participant) => {
+          console.log(`A remote Participant connected: ${participant}`);
+
+          const div = document.createElement("div");
+          div.id = participant.sid;
+          div.classList.add("full-width", "full-height");
+          mediaContainer.appendChild(div);
+
+          participant.tracks.forEach((publication) => {
+            // check if participant accepted video and audio access
+            if (publication.track) {
+              const track = publication.track;
+              div.appendChild(track.attach());
+              console.log("attached to remote video");
+            }
+          });
+          participant.on("trackSubscribed", (track) => {
+            div.appendChild(track.attach());
+          });
+        });
+
+        room.on("participantConnected", (participant) => {
+          console.log(
+            `A remote Participant connected: ${participant.identity}`
+          );
+
+          const div = document.createElement("div");
+          div.id = participant.sid;
+          mediaContainer.appendChild(div);
+
+          participant.tracks.forEach((publication) => {
+            const track = publication.track;
+
+            // check if participant accepted video and audio access
+            if (publication.isSubscribed) {
+              div.appendChild(track.attach());
+              console.log("attached to remote video");
+            }
+          });
+          participant.on("trackSubscribed", (track) => {
+            div.appendChild(track.attach());
+          });
+        });
+
+        room.on("disconnected", (room) => {
+          // Detach the local media elements
+          room.localParticipant.tracks.forEach((publication) => {
+            publication.track.stop(); // stop all tracks
+            const attachedElements = publication.track.detach();
+            attachedElements.forEach((element) => element.remove());
+          });
+
+          // const remotedUser = document.getElementById(
+          //   room.localParticipant.sid
+          // );
+
+          // if (remotedUser.parentNode) {
+          //   remotedUser.parentNode.removeChild(remotedUser);
+          // }
+
+          // this.activeRoom = null;
+        });
+      });
     },
     leaveRoom() {
-      // const tracks = await createLocalTracks({ logLevel: "debug" });
-
-      // const room = await connect(this.token, {
-      //   name: this.room,
-      //   tracks,
-      // });
-
-      // room.on("disconnected", (room) => {
-      //   // Detach the local media elements
-      //   room.localParticipant.tracks.forEach((publication) => {
-      //     const attachedElements = publication.track.detach();
-
-      //     attachedElements.forEach((element) => element.remove());
-      //   });
-      // });
-
       // To disconnect from a Room
       this.activeRoom.disconnect();
-      console.log("room disconnected");
       // this.setToken("");
       // this.setSentToken(false);
     },
