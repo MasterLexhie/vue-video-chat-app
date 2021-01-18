@@ -33,9 +33,7 @@
         </div>
       </label>
       <div class="flex flex-v-center button__container">
-        <button class="btn-login no-border full-width">
-          Join Room
-        </button>
+        <button class="btn-login no-border full-width">Join Room</button>
         <div v-if="loader" class="loader"></div>
       </div>
     </form>
@@ -43,9 +41,7 @@
 </template>
 <script>
 import { mapMutations } from "vuex";
-// import { connect, createLocalTracks } from "twilio-video";
 import axios from "axios";
-
 
 export default {
   data() {
@@ -61,8 +57,6 @@ export default {
       this.loader = true;
       e.preventDefault();
 
-      // const tracks = await createLocalTracks();
-
       const result = await axios({
         method: "POST",
         url: "https://straw-quoll-8562.twil.io/create-token",
@@ -74,17 +68,11 @@ export default {
 
       const token = result.data;
 
-      // await connect(token, {
-      //   name: this.room,
-      //   tracks
-      // });
-
       this.setToken(token);
       this.setRoom(this.room);
 
       this.loader = false;
       this.setSentToken(true);
-
     },
   },
 };

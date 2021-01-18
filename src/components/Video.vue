@@ -1,6 +1,6 @@
 <template>
   <div class="videoComponent">
-    <h1 v-if="support">This browser is not supported by VueChat</h1>
+    <h1 v-if="noSupport">This browser is not supported by VueChat</h1>
     <div v-else>
       <div class="video">
         <div class="users full-width flex flex-h-bet flex-v-center">
@@ -17,12 +17,7 @@
 </template>
 <script>
 import OptionButtons from "./OptionButtons";
-import {
-  isSupported,
-  connect,
-  createLocalVideoTrack,
-  createLocalTracks,
-} from "twilio-video";
+import { isSupported, connect, createLocalTracks } from "twilio-video";
 import { mapState, mapMutations } from "vuex";
 
 export default {
@@ -32,25 +27,22 @@ export default {
   data() {
     return {
       hide: false,
-      support: false,
-      remoteUser: ''
+      noSupport: false,
+      remoteUser: "",
     };
   },
   computed: {
     ...mapState(["token", "room"]),
   },
-  watch: {
-    
-  },
+  watch: {},
   mounted() {
     this.startVideoChat();
   },
   methods: {
     ...mapMutations(["setToken", "setSentToken"]),
-    disconnect() {},
     startVideoChat() {
       if (!isSupported) {
-        return (this.support = true);
+        return (this.noSupport = true);
       }
 
       connect(this.token, {
@@ -59,42 +51,82 @@ export default {
         audio: true,
         logLevel: "debug",
       }).then((room) => {
-        createLocalVideoTrack({logLevel: "debug"})
-          .then((track) => {
-            this.$refs.videoRef.appendChild(track.attach());
-          })
-          .catch((error) => console.log({ localVideoError: error.message }));
-        room.participants.forEach(this.participantConnected);
-        room.on("participantConnected", this.participantConnected);
+        const mediaContainer = this.$refs.videoRef;
+
+        // helperFunction:  attach tracks to media container
+        const attachTrack = (track) => {
+          mediaContainer.appendChild(track.attach());
+        };
+
+        this.getLocalTrack(mediaContainer);
+
+        // Tracks that the Participant has already published and will eventually be published
+        room.on("participantConnected", (participant) => {
+          console.log(`Participant "${participant.identity}" connected`);
+
+          participant.tracks.forEach((publication) => {
+            if (publication.isSubscribed) {
+              const track = publication.track;
+              mediaContainer.appendChild(track.attach());
+            }
+          });
+
+          participant.on("trackSubscribed", attachTrack);
+        });
+
+        // attach remote tracks for remote participants that are already in the Room
+        room.participants.forEach((participant) => {
+          console.log(`Participant "${participant.identity}" connected`);
+
+          participant.tracks.forEach((publication) => {
+            if (publication.track) {
+              mediaContainer.appendChild(publication.track.attach());
+            }
+          });
+
+          participant.on("trackSubscribed", attachTrack);
+        });
+
+        // room.participants.forEach(this.participantConnected);
+        // room.on("participantConnected", this.participantConnected);
         room.on("participantDisconnected", this.participantDisconnected);
       });
     },
-    participantConnected(participant) {
-      this.remoteUser = participant.identity;
-      this.hide = true;
-
-      setTimeout(() => {
-        this.hide = false;
-      }, 10);
-
-      participant.tracks.forEach((trackPublication) => {
-        this.trackPublished(trackPublication, participant);
-      });
-      participant.on("trackPublished", this.trackPublished);
+    getLocalTrack(localParticipant) {
+      createLocalTracks({ logLevel: "debug" })
+        .then((localTracks) => {
+          localTracks.forEach((track) => {
+            localParticipant.appendChild(track.attach());
+          });
+        })
+        .catch((error) => console.log({ localTrackError: error.message }));
     },
-    trackPublished(trackPublication) {
-      const remoteParticipant = this.$refs.videoRef;
+    // participantConnected(participant) {
+    //   this.remoteUser = participant.identity;
+    //   // this.hide = true;
 
-      const trackSubscribed = (track) => {
-        remoteParticipant.appendChild(track.attach());
-      };
+    //   setTimeout(() => {
+    //     this.hide = false;
+    //   }, 10);
 
-      if (trackPublication.track) {
-        trackSubscribed(trackPublication.track);
-      }
+    //   participant.tracks.forEach((trackPublication) => {
+    //     this.trackPublished(trackPublication, participant);
+    //   });
+    //   participant.on("trackPublished", this.trackPublished);
+    // },
+    // trackPublished(trackPublication) {
+    //   const remoteParticipant = this.$refs.videoRef;
 
-      trackPublication.on("subscribed", trackSubscribed);
-    },
+    //   const trackSubscribed = (track) => {
+    //     remoteParticipant.appendChild(track.attach());
+    //   };
+
+    //   if (trackPublication.track) {
+    //     trackSubscribed(trackPublication.track);
+    //   }
+
+    //   trackPublication.on("subscribed", trackSubscribed);
+    // },
     participantDisconnected(participant) {
       participant.removeAllListeners();
       this.$ref.videoRef.remove();
@@ -119,8 +151,8 @@ export default {
       // To disconnect from a Room
       room.disconnect();
       console.log("room disconnected");
-      this.setToken("");
-      this.setSentToken(false);
+      // this.setToken("");
+      // this.setSentToken(false);
     },
   },
 };
