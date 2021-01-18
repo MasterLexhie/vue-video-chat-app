@@ -9,7 +9,6 @@
         <!-- <div class="users full-width flex flex-h-bet flex-v-center">
           <p v-if="hide">{{ `${remoteUser} has joined the room` }}</p>
         </div> -->
-
         <div class="flex flex-col full-screen-height video__container">
           <div ref="videoRef" class="video__body full-width"></div>
         </div>
@@ -64,11 +63,8 @@ export default {
         });
 
         room.participants.forEach((participant) => {
-          console.log(`A remote Participant connected: ${participant}`);
-
           const div = document.createElement("div");
           div.id = participant.sid;
-          div.classList.add("full-width", "full-height");
           mediaContainer.appendChild(div);
 
           participant.tracks.forEach((publication) => {
@@ -76,7 +72,6 @@ export default {
             if (publication.track) {
               const track = publication.track;
               div.appendChild(track.attach());
-              console.log("attached to remote video");
             }
           });
           participant.on("trackSubscribed", (track) => {
@@ -85,10 +80,6 @@ export default {
         });
 
         room.on("participantConnected", (participant) => {
-          console.log(
-            `A remote Participant connected: ${participant.identity}`
-          );
-
           const div = document.createElement("div");
           div.id = participant.sid;
           mediaContainer.appendChild(div);
@@ -99,7 +90,6 @@ export default {
             // check if participant accepted video and audio access
             if (publication.isSubscribed) {
               div.appendChild(track.attach());
-              console.log("attached to remote video");
             }
           });
           participant.on("trackSubscribed", (track) => {
@@ -126,10 +116,6 @@ export default {
           });
           this.activeRoom = null;
         });
-
-        window.addEventListener("beforeunload", room.disconnect());
-
-        window.addEventListener("pagehide", room.disconnect()); // for iOS
       });
     },
     leaveRoom() {
