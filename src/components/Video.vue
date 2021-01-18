@@ -123,7 +123,16 @@ export default {
           //   remotedUser.parentNode.removeChild(remotedUser);
           // }
 
-          // this.activeRoom = null;
+          this.activeRoom = null;
+        });
+
+        room.on("participantDisconnected", (participant) => {
+          participant.tracks.forEach((publication) => {
+            publication.track.stop(); // stop all tracks
+            const attachedElements = publication.track.detach();
+            attachedElements.forEach((element) => element.remove());
+          });
+          this.activeRoom = null;
         });
       });
     },
