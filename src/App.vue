@@ -29,7 +29,7 @@ export default {
     ...mapState(["tokenSent"]),
   },
   mounted() {
-    // this.isDeviceMobile();
+    this.isDeviceMobile();
   },
   methods: {
     isDeviceMobile() {
