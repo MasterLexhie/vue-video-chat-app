@@ -115,13 +115,6 @@ export default {
             attachedElements.forEach((element) => element.remove());
           });
 
-          const removedUser = document.getElementById(
-            room.localParticipant.sid
-          );
-          if (removedUser.parentNode) {
-            removedUser.parentNode.removeChild(removedUser);
-          }
-
           this.activeRoom = null;
         });
 
@@ -131,11 +124,6 @@ export default {
             const attachedElements = publication.track.detach();
             attachedElements.forEach((element) => element.remove());
           });
-
-          const removedUser = document.getElementById(participant.sid);
-          if (removedUser.parentNode) {
-            removedUser.parentNode.removeChild(removedUser);
-          }
           this.activeRoom = null;
         });
 
