@@ -20,7 +20,7 @@
 </template>
 <script>
 import OptionButtons from "./OptionButtons";
-import { isSupported, connect, createLocalTracks } from "twilio-video";
+import { isSupported, connect } from "twilio-video";
 import { mapState, mapMutations } from "vuex";
 
 export default {
@@ -67,9 +67,11 @@ export default {
         //   })
         //   .catch((error) => console.log({ localTrackError: error.message }));
 
-        const localParticipant = [...room.localParticipant.videoTracks.values()][0];
+        const localParticipant = [
+          ...room.localParticipant.videoTracks.values(),
+        ][0];
         mediaContainer.appendChild(localParticipant.attach());
-        
+
         console.log(
           `Connected to the Room as LocalParticipant "${localParticipant.identity}"`
         );
@@ -129,7 +131,7 @@ export default {
           // const remotedUser = document.getElementById(
           //   room.localParticipant.sid
           // );
-          
+
           // if (remotedUser.parentNode) {
           //   remotedUser.parentNode.removeChild(remotedUser);
           // }
