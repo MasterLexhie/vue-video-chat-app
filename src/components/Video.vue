@@ -96,10 +96,13 @@ export default {
       createLocalTracks({ logLevel: "debug" })
         .then((localTracks) => {
           localTracks.forEach((track) => {
+            console.log({
+              localParticipant,
+              localParticipantID: localParticipant
+            })
             localParticipant.appendChild(track.attach());
           });
-        })
-        .catch((error) => console.log({ localTrackError: error.message }));
+        }).catch((error) => console.log({ localTrackError: error.message }));
     },
     // participantConnected(participant) {
     //   this.remoteUser = participant.identity;
