@@ -59,15 +59,17 @@ export default {
 
         // this.getLocalTrack(mediaContainer);
 
-        createLocalTracks()
-          .then((Tracks) => {
-            Tracks.forEach((track) => {
-              mediaContainer.appendChild(track.attach());
-            });
-          })
-          .catch((error) => console.log({ localTrackError: error.message }));
+        // createLocalTracks()
+        //   .then((Tracks) => {
+        //     Tracks.forEach((track) => {
+        //       mediaContainer.appendChild(track.attach());
+        //     });
+        //   })
+        //   .catch((error) => console.log({ localTrackError: error.message }));
 
-        const localParticipant = room.localParticipant;
+        const localParticipant = [...room.localParticipant.videoTracks.values()][0];
+        mediaContainer.appendChild(localParticipant.attach());
+        
         console.log(
           `Connected to the Room as LocalParticipant "${localParticipant.identity}"`
         );
@@ -100,7 +102,6 @@ export default {
 
           const div = document.createElement("div");
           div.id = participant.sid;
-          div.classList.add("full-width", "full-height");
           mediaContainer.appendChild(div);
 
           participant.tracks.forEach((publication) => {
@@ -117,12 +118,6 @@ export default {
           });
         });
 
-        console.log({
-          tracks: room.localParticipant.tracks,
-          videoTracks: room.localParticipant.videoTracks,
-          participants: room.localParticipant,
-        });
-
         room.on("disconnected", (room) => {
           // Detach the local media elements
           room.localParticipant.tracks.forEach((publication) => {
@@ -131,58 +126,18 @@ export default {
             attachedElements.forEach((element) => element.remove());
           });
 
-          const remoteUser = document.getElementById(room.localParticipant.sid);
-          mediaContainer.removeChild(remoteUser);
+          // const remotedUser = document.getElementById(
+          //   room.localParticipant.sid
+          // );
+          
+          // if (remotedUser.parentNode) {
+          //   remotedUser.parentNode.removeChild(remotedUser);
+          // }
 
-          console.log({
-            remoteUser: room.localParticipant,
-          });
-
-          this.activeRoom = null;
+          // this.activeRoom = null;
         });
-        // room.on('participantDisconnected', participant => {
-        //   console.log(`Participant disconnected: ${participant.identity}`);
-
-        // });
-
-        // room.participants.forEach(this.participantConnected);
-        // room.on("participantConnected", this.participantConnected);
-        // room.on("participantDisconnected", this.participantDisconnected);
       });
     },
-    // getLocalTrack(localParticipant) {
-
-    // },
-    // participantConnected(participant) {
-    //   this.remoteUser = participant.identity;
-    //   // this.hide = true;
-
-    //   // setTimeout(() => {
-    //   //   this.hide = false;
-    //   // }, 10);
-
-    //   participant.tracks.forEach((trackPublication) => {
-    //     this.trackPublished(trackPublication, participant);
-    //   });
-    //   participant.on("trackPublished", this.trackPublished);
-    // },
-    // trackPublished(trackPublication) {
-    //   const remoteParticipant = this.$refs.videoRef;
-
-    //   const trackSubscribed = (track) => {
-    //     remoteParticipant.appendChild(track.attach());
-    //   };
-
-    //   if (trackPublication.track) {
-    //     trackSubscribed(trackPublication.track);
-    //   }
-
-    //   trackPublication.on("subscribed", trackSubscribed);
-    // },
-    // participantDisconnected(participant) {
-    //   participant.removeAllListeners();
-    //   this.$ref.videoRef.remove();
-    // },
     leaveRoom() {
       // const tracks = await createLocalTracks({ logLevel: "debug" });
 
