@@ -66,7 +66,9 @@ export default {
         //     });
         //   })
         //   .catch((error) => console.log({ localTrackError: error.message }));
-
+        room.localParticipant.tracks.forEach(track => {
+          mediaContainer.appendChild(track.attach());
+        })
         console.log(
           `Connected to the Room as LocalParticipant "${room.localParticipant.identity}"`,
           { localParticipant: room.localParticipant }
