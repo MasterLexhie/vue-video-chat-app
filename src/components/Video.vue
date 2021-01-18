@@ -111,6 +111,7 @@ export default {
           // Detach the local media elements
           room.localParticipant.tracks.forEach((publication) => {
             publication.track.stop(); // stop all tracks
+            publication.unpublish();
             const attachedElements = publication.track.detach();
             attachedElements.forEach((element) => element.remove());
           });
@@ -129,6 +130,7 @@ export default {
         room.on("participantDisconnected", (participant) => {
           participant.tracks.forEach((publication) => {
             publication.track.stop(); // stop all tracks
+            publication.unpublish();
             const attachedElements = publication.track.detach();
             attachedElements.forEach((element) => element.remove());
           });
