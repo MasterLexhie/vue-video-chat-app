@@ -77,6 +77,7 @@ export default {
 
           const div = document.createElement("div");
           div.id = participant.sid;
+          div.classList.add("full-width", "full-height");
           mediaContainer.appendChild(div);
 
           participant.tracks.forEach((publication) => {
@@ -99,6 +100,7 @@ export default {
 
           const div = document.createElement("div");
           div.id = participant.sid;
+          div.classList.add("full-width", "full-height");
           mediaContainer.appendChild(div);
 
           participant.tracks.forEach((publication) => {
@@ -130,7 +132,7 @@ export default {
           });
 
           const remoteUser = document.getElementById(room.localParticipant.sid);
-          remoteUser.remove();
+          mediaContainer.remove(remoteUser);
 
           console.log({
             remoteUser: room.localParticipant,
@@ -219,11 +221,6 @@ export default {
 .video__body {
   width: 100%;
   height: 50%;
-}
-
-.video__ref > div {
-  width: 100%;
-  height: 100%;
 }
 
 .users {
