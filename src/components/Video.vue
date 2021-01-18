@@ -20,7 +20,7 @@
 </template>
 <script>
 import OptionButtons from "./OptionButtons";
-import { isSupported, connect, createLocalTracks } from "twilio-video";
+import { isSupported, connect } from "twilio-video";
 import { mapState, mapMutations } from "vuex";
 
 export default {
